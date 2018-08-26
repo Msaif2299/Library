@@ -7,6 +7,7 @@
 
 void Book::setAuthor(string author) {
 	this->author = author;
+	//added this comment for testing
 }
 
 void Book::setEdition(int edition) {
