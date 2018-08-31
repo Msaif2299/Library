@@ -311,3 +311,111 @@ void Book::getAllBooks() {
 Book::~Book()
 {
 }
+//Check if this works or needs any improvement or change
+//The code has been compiling successfully so far
+//Just see if the code for file search and delete is correct
+//Feel free to suggest any changes whatsover, always welcoming them.
+fstream f;
+struct booksIssued
+{
+	char LibraryID[100];
+	char ISBN[13];
+};
+
+class Employee
+{
+private:
+	char employeeID[10];
+	char membershipID[10];
+	booksIssued Books[100];
+	int bookCount;
+
+public:
+	Employee(){
+		memset(&employeeID,'\0',sizeof(employeeID));
+		memset(&membershipID,'\0',sizeof(membershipID));
+
+	}
+	int getBookCount(){
+		return bookCount;
+	}
+	
+	char* getEmployeeID(){
+		return employeeID;
+	}
+
+	char* getMemberID(){
+		return membershipID;
+	}
+
+	booksIssued* getBooksIssued(){
+		return Books;
+	}
+
+	// void alterEmployeeID(){
+	// 	cin.get(employeeID,10);
+	// }
+
+	// void alterMembershipID(){
+	// 	cin.get(membershipID,10);
+	// }
+
+	void addEmployee(Employee& obj){
+		// char* temp = getMemberID();
+		cin.get(employeeID,10);
+		cin.get(membershipID,10);
+		if(existingEmployee() == false){		//no existing ID of the employee
+			f.open("EmployeeData.dat",ios::out|ios::app|ios::binary);
+			f.write((char*)&obj,sizeof(obj));
+			f.close();
+		}
+		else{
+			cout<<"Already Registered."<<endl;
+		}
+	}
+
+	void deleteEmployee(Employee& obj){
+		fstream fin;
+		fstream fout;
+		Employee temp;
+		fin.open("temp.dat",ios::in|ios::out|ios::binary);
+		fout.open("EmployeeData.dat",ios::in|ios::out|ios::app|ios::binary);
+		fin.seekg(0,ios::beg);
+		while(fin.read((char*)&temp,sizeof(temp))){
+			if(strcmpi(obj.getMemberID(),temp.getMemberID()) == 0){
+				continue;
+			}
+			else{
+				fout.write((char*)&temp,sizeof(temp));
+			}
+		}
+		fin.close();
+		fout.close();
+		remove("EmployeeData.dat");
+		rename("temp.dat","EmployeeData.dat");
+
+	}
+
+	void addBook(Employee& b){
+		++bookCount;
+		int idx = bookCount - 1;
+		cin.get(Books[idx].LibraryID,100);
+		cin.get(Books[idx].ISBN,13);
+	}
+
+	bool existingEmployee(){
+		Employee temp;
+		f.open("EmployeeData.dat", ios::in | ios::binary);
+		while(f.read((char*)&temp,sizeof(temp))){
+				if(strcmpi(temp.membershipID,getMemberID()) == 0){
+					f.close();
+					return true;
+				}
+		}
+		f.close();
+		return false;
+
+	}
+
+	
+};
