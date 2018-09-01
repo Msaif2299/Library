@@ -315,13 +315,14 @@ Book::~Book()
 //The code has been compiling successfully so far
 //Just see if the code for file search and delete is correct
 //Feel free to suggest any changes whatsover, always welcoming them.
+
 fstream f;
 struct booksIssued
 {
 	char LibraryID[100];
 	char ISBN[13];
 };
-
+ 
 class Employee
 {
 private:
@@ -334,6 +335,8 @@ public:
 	Employee(){
 		memset(&employeeID,'\0',sizeof(employeeID));
 		memset(&membershipID,'\0',sizeof(membershipID));
+		bookCount = 0;
+		// addEmployee();
 
 	}
 	int getBookCount(){
@@ -362,12 +365,15 @@ public:
 
 	void addEmployee(Employee& obj){
 		// char* temp = getMemberID();
-		cin.get(employeeID,10);
-		cin.get(membershipID,10);
+		// cin.get(obj.employeeID,10);
+		cin>>obj.employeeID;
+		// cin.get(obj.membershipID,10);
+		cin>>obj.membershipID;
 		if(existingEmployee() == false){		//no existing ID of the employee
 			f.open("EmployeeData.dat",ios::out|ios::app|ios::binary);
 			f.write((char*)&obj,sizeof(obj));
 			f.close();
+			cout<<"Employee Added"<<endl;
 		}
 		else{
 			cout<<"Already Registered."<<endl;
@@ -383,10 +389,11 @@ public:
 		fin.seekg(0,ios::beg);
 		while(fin.read((char*)&temp,sizeof(temp))){
 			if(strcmpi(obj.getMemberID(),temp.getMemberID()) == 0){
+				cout<<obj.employeeID<<" "<<temp.employeeID;
 				continue;
 			}
 			else{
-				fout.write((char*)&temp,sizeof(temp));
+				fin.write((char*)&temp,sizeof(temp));
 			}
 		}
 		fin.close();
@@ -397,17 +404,41 @@ public:
 	}
 
 	void addBook(Employee& b){
+		int nBooks;
+		cout<<"Number of books being issued: ";
+		cin>>nBooks;
+		while(nBooks--){
+			cout<<"1"<<endl;
 		++bookCount;
 		int idx = bookCount - 1;
-		cin.get(Books[idx].LibraryID,100);
-		cin.get(Books[idx].ISBN,13);
+		cout<<"idx: "<<idx<<endl;
+		cin>>b.Books[idx].LibraryID;
+		cin>>b.Books[idx].ISBN;
+		}
+		fstream ftemp;
+		ftemp.open("temp.dat", ios::in | ios::out | ios::binary | ios::app);
+		f.open("EmployeeData.dat", ios::in | ios::binary);
+		Employee temp;
+		while(f.read((char*)&temp,sizeof(temp))){
+
+			if(strcmpi(b.getMemberID(),temp.getMemberID()) == 0){
+				ftemp.write((char*)&b,sizeof(b));
+				continue;
+			}
+			ftemp.write((char*)&temp,sizeof(temp));
+		}
+		f.close();
+		ftemp.close();
+		cout<<"Book added"<<endl;
+		remove("EmployeeData.dat");
+		rename("temp.dat","EmployeeData.dat");
 	}
 
 	bool existingEmployee(){
 		Employee temp;
 		f.open("EmployeeData.dat", ios::in | ios::binary);
 		while(f.read((char*)&temp,sizeof(temp))){
-				if(strcmpi(temp.membershipID,getMemberID()) == 0){
+				if(strcmpi(temp.employeeID,getEmployeeID()) == 0){
 					f.close();
 					return true;
 				}
@@ -417,5 +448,30 @@ public:
 
 	}
 
+	void showInfo(Employee& obj){
+		cout<<"EmployeeID: "<<obj.employeeID<<endl;
+		cout<<"MembershipID: "<<obj.membershipID<<endl;
+	}
+
+	void showInformation(){
+		f.open("EmployeeData.dat", ios::in | ios::binary);
+		Employee temp;
+		while(f.read((char*)&temp,sizeof(temp))){
+			showInfo(temp);
+		}
+	}
+
 	
 };
+
+int main(){
+	Employee e1,e2;
+	// e1.addEmployee(e1);
+	// e1.deleteEmployee(e1);
+	e1.addEmployee(e1);
+	e2.addEmployee(e2);
+	e2.deleteEmployee(e1);
+	cout<<"list is"<<endl;
+	e1.showInformation();
+
+}
