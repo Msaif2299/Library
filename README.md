@@ -1,2 +1,0 @@
-# Library
-DBMS Assignment. 
